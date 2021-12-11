@@ -14,6 +14,7 @@
 #include "servo.h"
 #include <math.h>
 #include <alarm.h>
+#include "stdio.h"
 #define PI 3.14159265358979323846
 
 typedef struct values{
@@ -26,11 +27,13 @@ int init_angle[10];
  int final_angle[10];
  int widths[10];
  values aarray[90];
- double IR =0;
+ double IR = 0;
+ char arr[100];
  volatile int distance;
 
 void scan_area(){
     int i = 0;//Current Angle
+    int j;
     int smallest = 100;//Smallest object
     int items = 0;// Amount of items
     int obj = 0;// Boolean used to detect if on an object or not
@@ -45,7 +48,7 @@ void scan_area(){
             ping_read();
 
             int ping = (adc_read());
-            IR = -1.745222 + (48.34164 + 1.745222) / pow((1 + pow((ping/743.249), 516.1554)), .002017931);// Shift IR-- BOT 10
+            IR = -1.745222 + (48.34164 + 1.745222) / pow((1 + pow((ping / 743.249), 516.1554)), .002017931);// Shift IR-- BOT 10
 
             aarray[angle].angle = angle;//Put everything inside struct
             aarray[angle].IR = IR;
@@ -68,10 +71,15 @@ void scan_area(){
             }
 
             timer_waitMillis(100);
+            sprintf(arr, "Degrees: %d IR: %d \n\r", aarray[angle].angle, aarray[angle].IR);
+            int n = strlen(arr);
+            for(j = 0; j < n; j++){
+                sprintf(arr, "Degrees: %d IR: %d \n\r", aarray[angle].angle, aarray[angle].IR);
+                uart_sendChar(arr[j]);
+            }
 
-           lcd_printf("Angle: %d \n IR: %lf \n Objects: %d \n", aarray[angle].angle, aarray[angle].IR, items);
+
+//           lcd_printf("Angle: %d \n IR: %lf \n Objects: %d \n", aarray[angle].angle, aarray[angle].IR, items);
 
         }
 }
-
-
